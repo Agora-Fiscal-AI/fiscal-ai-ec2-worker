@@ -1,0 +1,41 @@
+0,1,2,3
+,,Asistencia social,20.00
+,,Asistencia animal,25.00
+,Comercio,Tiendas y expendios de productos básicos,15.00
+,,Tiendas de autoservicio,25.00
+,,Tiendas de departamentos,40.00
+,,"Tiendas de especialidades y centros
+comerciales",50.00
+,,"Ventas de materiales de construcción y
+vehículos",25.00
+,,Tiendas de servicios,20.00
+,,Mixto (Local y otros),15.00
+,Abasto,Almacenamiento y abasto menos de 1000 M2,30.00
+,,Más de 1000 M2,50.00
+,Comunicaciones,,40.00
+,Transporte,,30.00
+,Recreación,Recreación social,20.00
+,,Alimentación y bebidas,40.00
+,,Entretenimiento,30.00
+,Deportes,Deportes al aire libre y acuáticos,20.00
+,,Clubes a cubierto,30.00
+,Servicios urbanos,"Defensa, policía, bomberos, emergencias",20.00
+,,"Cementerios, mausoleos, crematorios y
+agencias de inhumaciones",30.00
+,,Basureros,10.00
+,Administración,Administración pública,20.00
+,,Administración privada,30.00
+,Alojamiento,Hoteles,40.00
+,,Moteles,30.00
+Industrias,Aislada,,70.00
+,Pesada,,60.00
+,Mediana,,50.00
+,Ligera,,40.00
+Espacios abiertos,"Plazas, jardines, parques y cuerpos de agua",,20.00
+Infraestructura,"Torres, antenas, depósitos, almacenaje, cárcamos y bombas",,20.00
+,"Por Revisión de modificación de proyecto (torres, antenas,
+depósitos, almacenaje, cárcamos, bombas e instalaciones en vía
+pública)",,25.00
+"Estaciones de carburación, gasolineras o hidrocarburos",,,30.00
+"Agropecuario, forestal y acuífero",,,20.00 a 30.00
+Otros no especificados,,,10.00
