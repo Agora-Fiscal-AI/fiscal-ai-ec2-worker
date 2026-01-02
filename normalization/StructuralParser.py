@@ -1,12 +1,19 @@
 from typing import List, Dict
-import re
 import unicodedata
+import re
 #from DetectedElement import DetectedElement
 
 #CONFIGURATION = LegalStrctureConfig()  Configuration instance
 #RAW_TEXT = RawTextDocument(get_text("Fiscalizacion.pdf"), "Fiscalizacion.pdf") # Raw text instance already splitted in lines
 
 
+def normalize_text(s: str) -> str:
+    s = unicodedata.normalize("NFKC", s)
+    return s
+
+# Remove invisible caracters from the raw Information
+def clean_invisible(s: str) -> str:
+    return re.sub(r"[\u200B\u200C\u200D\uFEFF]", "", s)
 
 
 class LevelMatch:
@@ -64,17 +71,19 @@ class LevelDetector:
 
         if aliases:
             alias_pattern = "|".join(re.escape(a) for a in aliases)
-            base_pattern = rf"^(?P<alias>{alias_pattern})\s+"
+            base_pattern = rf"^(?P<alias>{alias_pattern})\s*+"
         else:
             base_pattern = ""
 
         line = line.strip()
-
+        line = normalize_text(line)
+        line = clean_invisible(line)
+ 
         # simple regex
         if isinstance(regex, str):
             pattern = base_pattern + regex
             
-            m = re.match(pattern, line, re.IGNORECASE)
+            m = re.match(pattern, line, re.IGNORECASE) if aliases else re.match(pattern, line)
             if not m:
                 return None
             groups = m.groupdict()
@@ -89,8 +98,8 @@ class LevelDetector:
         if isinstance(regex, dict):
             for num_type, num_pattern in regex.items():
                 pattern = base_pattern + num_pattern
-                
-                m = re.match(pattern, line, re.IGNORECASE)
+
+                m = re.match(pattern, line, re.IGNORECASE) if aliases else re.match(pattern, line)
                 if not m:
                     continue
                 #print(f"patron dic: {pattern} \n")

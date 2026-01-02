@@ -1,13 +1,21 @@
 import pdfplumber
-import os
 
+def group_words_into_lines(words, tolerance=2.5):
+    lines = []
+
+    for w in sorted(words, key=lambda w: w["top"]):
+        placed = False
+        for line in lines:
+            if abs(line["top"] - w["top"]) <= tolerance:
+                line["words"].append(w)
+                placed = True
+                break
+        if not placed:
+            lines.append({"top": w["top"], "words": [w]})
+
+    return lines
 
 def extract_pdf_text(pdf_path: str) -> str:
-    """
-    Extracts raw, ordered, line-preserved text from a PDF file.
-    Tables are intentionally ignored at this stage.
-    """
-
     full_text_lines = []
 
     with pdfplumber.open(pdf_path) as pdf:
@@ -21,20 +29,13 @@ def extract_pdf_text(pdf_path: str) -> str:
                 extra_attrs=["fontname", "size"]
             )
 
-      
-            lines = {}
-            for w in words:
-                top = round(w["top"], 1)
+            words = [w for w in words if w["top"] > 0]  #In case of having headers in the pages, is necesary to calculate the main coordinate where they are located and stablish here the most accurable Y value to avoiding them. If not, leave it as a 0
 
-                if top <= 40:
-                    continue
+            lines = group_words_into_lines(words, tolerance=2.5)
 
-                lines.setdefault(top, []).append(w)
-
-            for top in sorted(lines.keys()):
-                line_words = sorted(lines[top], key=lambda w: w["x0"])
+            for line in lines:
+                line_words = sorted(line["words"], key=lambda w: w["x0"])
                 line_text = " ".join(w["text"] for w in line_words).strip()
-
                 if line_text:
                     full_text_lines.append(line_text)
 
@@ -47,7 +48,7 @@ def get_text(pdf_path: str) -> str:
 
     raw_text = extract_pdf_text(pdf_path)
     
-    with open("texto_amealco_raw.txt", "w", encoding="utf-8") as f:
+    with open("texto_transparencia_raw.txt", "w", encoding="utf-8") as f:
         f.write(raw_text)
 
     print("Extracción completada.")
