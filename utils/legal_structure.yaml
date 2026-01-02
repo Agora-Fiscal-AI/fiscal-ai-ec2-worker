@@ -1,0 +1,154 @@
+# ============================================================
+# CONFIGURACIÓN ESTRUCTURAL JURÍDICA
+# Este archivo define la estructura de una ley.
+# ============================================================
+
+meta:
+  jurisdiction: "MX"
+  language: "es"
+  encoding: "utf-8"
+  version: "1.0"
+  description: "Constitución Política de los Estados Unidos Mexicanos"
+
+# ------------------------------------------------------------
+#Definicion de niveles juridicos
+# El orden define la jerarquía (de mayor a menor) Ley de Fiscalizacion
+# ------------------------------------------------------------
+
+levels:
+
+  - id: title
+    name: "Título"
+    aliases: ["TÍTULO", "TITULO"]
+    optional: false
+    numbering:
+      type: cardinal_word
+      regex: '(?P<num>Primero|Segundo|Tercero|Cuarto|Quinto|Sexto|Séptimo|Octavo|Noveno|Décimo|Undécimo|Duodécimo|Decimotercero|Decimocuarto|Decimoquinto|Decimosexto|Decimoséptimo|Decimoctavo|Decimonoveno|Vigésimo|Primera|Segunda|Tercera|Cuarta|Quinta|Sexta|Séptima|Octava|Novena|Décima|Undécima|Duodécima|Decimotercera|Decimocuarta|Decimoquinta|Decimosexta|Decimoséptima|Decimoctava|Decimonovena|Vigésima)'
+    children: ["chapter"]
+
+  - id: chapter
+    name: "Capítulo"
+    aliases: ["CAPÍTULO", "CAPITULO"]
+    optional: false
+    numbering:
+      type: cardinal_word
+      regex: '(?P<num>Único|Única|Primero|Segundo|Tercero|Cuarto|Quinto|Sexto|Séptimo|Octavo|Noveno|Décimo|Undécimo|Duodécimo|Decimotercero|Decimocuarto|Decimoquinto|Decimosexto|Decimoséptimo|Decimoctavo|Decimonoveno|Vigésimo|Primera|Segunda|Tercera|Cuarta|Quinta|Sexta|Séptima|Octava|Novena|Décima|Undécima|Duodécima|Decimotercera|Decimocuarta|Decimoquinta|Decimosexta|Decimoséptima|Decimoctava|Decimonovena|Vigésima)'
+    children: ["section","article"]
+
+  - id: section
+    name: "Sección"
+    aliases: ["SECCIÓN", "SECCION"]
+    optional: false
+    numbering:
+      type: cardinal_word
+      regex: '(?P<num>Único|Única|Primero|Segundo|Tercero|Cuarto|Quinto|Sexto|Séptimo|Octavo|Noveno|Décimo|Undécimo|Duodécimo|Decimotercero|Decimocuarto|Decimoquinto|Decimosexto|Decimoséptimo|Decimoctavo|Decimonoveno|Vigésimo|Primera|Segunda|Tercera|Cuarta|Quinta|Sexta|Séptima|Octava|Novena|Décima|Undécima|Duodécima|Decimotercera|Decimocuarta|Decimoquinta|Decimosexta|Decimoséptima|Decimoctava|Decimonovena|Vigésima)'
+    children: ["article"]
+
+  - id: article
+    name: "Artículo"
+    aliases: ["ARTÍCULO", "ART.", "ARTICULO"]
+    optional: false
+    numbering:
+      type: arabic
+      regex: (?P<num>\d+(?:\s+(?:bis|ter))?)\.
+    children: ["paragraph", "fraction","apartado", "inciso"]
+
+  - id: paragraph
+    name: "Párrafo"
+    aliases: []
+    optional: true
+    implicit: true
+    children: ["fraction"]
+
+  - id: fraction
+    name: "Fracción"
+    aliases: []
+    optional: false
+    numbering:
+      type: mixed 
+      allowed:
+        - roman 
+        - arabic
+      regex:
+        roman: '^(?P<num>[IVXLCDM]+)\.'
+      
+    children: ["inciso"]
+
+  - id: inciso
+    name: "Inciso"
+    aliases: []
+    optional: false
+    numbering:
+      type: mixed
+      allowed:
+        - alpha
+        - arabic
+      regex:
+        alpha: '^\s*(?P<num>[a-z])(?:\)|\.)'
+       
+    children: []
+
+  - id: apartado
+    name: "Apartado"
+    aliases: ["APARTADO"]
+    optional: false
+    numbering:
+      type: alpha 
+      allowed: 
+        - arabic
+      regex: '(?P<num>[A-Z])\.?'
+
+    children: ["inciso", "article"]
+
+
+
+# GENERAL STRUCTURAL VALIDATION RULES
+
+validation:
+
+  enforce_hierarchy: true
+
+  unique_ids:
+    scope: "law"   # There cannot be equal articles in one law
+
+  numbering:
+    strict_sequence: true   # permite saltos (ej. reformas mal redactadas)
+    case_sensitive: false
+
+  orphan_rules:
+    forbid:
+      - inciso_without_fraction
+      - fraction_without_article
+
+
+# NORMALIZATION BEFORE PARSING
+
+preprocessing:
+  normalize_whitespace: true
+  normalize_accents: true  
+  preserve_line_breaks: true
+  remove_page_numbers: true
+  remove_headers: true
+  remove_footers: true
+
+
+# NORMATIVE VERSIONED CONTROL
+
+
+versioning:
+  enabled: true
+  granularity: "article"
+  allow_parallel_versions: true
+
+
+# OBLIGATORY METADATA PER NODE (EXTREMELY IMPORTANT FOR CHUNKING)
+
+node_metadata:
+  required:
+    - id
+    - level
+    - number
+    - text
+    - order
+    - parent_id
+    - law_version
