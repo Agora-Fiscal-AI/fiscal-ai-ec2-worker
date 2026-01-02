@@ -6,7 +6,7 @@ from RawTextDocument import RawTextDocument
 from TextExtractor import get_text
 
 CONFIGURATION: LegalStrctureConfig = LegalStrctureConfig()  # Configuration instance
-RAW_TEXT: str = RawTextDocument(get_text("Fiscalizacion.pdf"), "Fiscalizacion.pdf") # Raw text instance already splitted in lines
+RAW_TEXT: str = RawTextDocument(get_text("constitucion.pdf"), "constitucion.pdf") # Raw text instance already splitted in lines
 
 class StructureBuilder:
     """
@@ -59,27 +59,22 @@ class StructureBuilder:
         self.stack.append(node)
 
     def _find_parent(self, level_id: str) -> Optional[NormNode]:
-        """
-        finds the nearest valid parent for the given level.
-        Pops invalid stack nodes if necessary
-        """
         allowed_parents = self._allowed_parents(level_id)
-        while self.stack:
-            candidate = self.stack[-1]
+
+        for candidate in reversed(self.stack):
             if candidate.level in allowed_parents:
                 return candidate
-            self.stack.pop()
 
         return None
+
+
+        
     def _allowed_parents(self, level_id: str) -> List[str]:
-        """
-        make the query to the .yaml to see what are its level parents
-        """
+        parents = []
         for level in self.config.levels.values():
             if level_id in level.children:
-                return [level.level_id]
-        return []
-
+                parents.append(level.level_id)
+        return parents
 
 def create_tree() -> Tuple[List[NormNode], List[LevelMatch]]:
     tree = StructureBuilder("2025-01-1")
